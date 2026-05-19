@@ -13,13 +13,13 @@ export default function PaymentPage() {
 
   useEffect(() => {
     if (!fineId) return;
-    fetch(`/api/fines?fineId=${encodeURIComponent(fineId)}`).then(r => r.json()).then(j => setFine(j.fine));
+    fetch(`http://localhost:3001/api/fines?fineId=${encodeURIComponent(fineId)}`).then(r => r.json()).then(j => setFine(j.fine));
   }, [fineId]);
 
   async function confirm() {
     if (!fine) return;
     setLoading(true);
-    const res = await fetch('/api/payments', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fineId: fine.fineId, method }) });
+    const res = await fetch('http://localhost:3001/api/payments', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fineId: fine.fineId, method }) });
     const json = await res.json();
     setLoading(false);
     router.push(`/receipt?receiptId=${json.receiptId}`);

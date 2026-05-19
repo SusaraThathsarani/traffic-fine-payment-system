@@ -11,7 +11,7 @@ export default function LookupPage() {
   async function search() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/fines?vehicle=${encodeURIComponent(vehicle)}`);
+      const res = await fetch(`http://localhost:3001/api/fines?vehicle=${encodeURIComponent(vehicle)}`);
       const json = await res.json();
       setResult(json.fine);
     } finally {

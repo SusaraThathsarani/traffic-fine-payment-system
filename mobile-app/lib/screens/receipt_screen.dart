@@ -3,10 +3,16 @@ import 'package:flutter/material.dart';
 import '../models/traffic_fine.dart';
 
 class ReceiptScreen extends StatelessWidget {
-  const ReceiptScreen({super.key, required this.fine, required this.paymentMethod});
+  const ReceiptScreen({
+    super.key,
+    required this.fine,
+    required this.paymentMethod,
+    this.receiptId,
+  });
 
   final TrafficFine fine;
   final String paymentMethod;
+  final String? receiptId;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +46,7 @@ class ReceiptScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Receipt generated for ${fine.fineId}',
+                    'Receipt: ${receiptId ?? fine.fineId}',
                     style: const TextStyle(color: Colors.white70),
                   ),
                 ],

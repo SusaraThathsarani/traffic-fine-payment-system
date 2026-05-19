@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/traffic_fine.dart';
+import '../services/api_service.dart';
 import 'receipt_screen.dart';
 
 class PaymentScreen extends StatefulWidget {
@@ -14,6 +15,7 @@ class PaymentScreen extends StatefulWidget {
 
 class _PaymentScreenState extends State<PaymentScreen> {
   String _paymentMethod = 'Card';
+  bool _isProcessing = false;
 
   @override
   Widget build(BuildContext context) {
@@ -81,17 +83,40 @@ class _PaymentScreenState extends State<PaymentScreen> {
           ),
           const SizedBox(height: 18),
           ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => ReceiptScreen(
-                    fine: widget.fine,
-                    paymentMethod: _paymentMethod,
-                  ),
-                ),
-              );
-            },
-            child: const Text('Confirm payment'),
+            onPressed: _isProcessing
+                ? null
+                : () async {
+                    setState(() => _isProcessing = true);
+                    final methodMap = {
+                      'Card': 'card',
+                      'Cash': 'cash',
+                      'Wallet': 'wallet',
+                    };
+                    final result = await ApiService.processPayment(
+                      widget.fine.fineId,
+                      methodMap[_paymentMethod] ?? 'card',
+                    );
+                    setState(() => _isProcessing = false);
+
+                    if (result != null && mounted) {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => ReceiptScreen(
+                            fine: widget.fine,
+                            paymentMethod: _paymentMethod,
+                            receiptId: result['receiptId'] ?? 'N/A',
+                          ),
+                        ),
+                      );
+                    }
+                  },
+            child: _isProcessing
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Text('Confirm payment'),
           ),
         ],
       ),

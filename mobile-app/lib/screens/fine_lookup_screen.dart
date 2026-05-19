@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/traffic_fine.dart';
+import '../services/api_service.dart';
 import 'payment_screen.dart';
 
 class FineLookupScreen extends StatefulWidget {
@@ -23,25 +24,20 @@ class _FineLookupScreenState extends State<FineLookupScreen> {
     super.dispose();
   }
 
-  void _searchFine() {
+  void _searchFine() async {
     if (_vehicleController.text.trim().isEmpty && _fineController.text.trim().isEmpty) {
       setState(() => _result = null);
       return;
     }
 
-    setState(() {
-      _result = TrafficFine(
-        fineId: _fineController.text.trim().isEmpty ? 'TF-2026-0147' : _fineController.text.trim(),
-        vehicleNumber: _vehicleController.text.trim().isEmpty ? 'WP 1234' : _vehicleController.text.trim(),
-        driverName: 'K. Perera',
-        offence: 'Speeding in a restricted zone',
-        location: 'Galle Road, Colombo',
-        officerName: 'Sgt. D. Silva',
-        amount: 7500,
-        issuedAt: DateTime(2026, 5, 19, 9, 40),
-        status: 'Pending',
-      );
-    });
+    TrafficFine? fine;
+    if (_vehicleController.text.trim().isNotEmpty) {
+      fine = await ApiService.getFineByVehicle(_vehicleController.text.trim());
+    } else if (_fineController.text.trim().isNotEmpty) {
+      fine = await ApiService.getFineById(_fineController.text.trim());
+    }
+
+    setState(() => _result = fine);
   }
 
   @override
