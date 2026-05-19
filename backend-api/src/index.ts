@@ -1,7 +1,11 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
+import dotenv from 'dotenv';
+dotenv.config();
 import { db } from './db';
 import type { PaymentRequest } from './types';
+import { sendSms } from './sms';
+import { requestOtp, verifyOtp } from './otp';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -44,10 +48,52 @@ app.post('/api/payments', (req: Request, res: Response) => {
 
   try {
     const receipt = db.recordPayment(fineId, method);
+    const fine = db.findFineById(fineId);
+    if (fine?.phone) {
+      sendSms(
+        fine.phone,
+        `Payment received for fine ${fineId}. Receipt ${receipt.receiptId}. Amount ${receipt.amount} LKR.`
+      );
+    }
     res.json(receipt);
   } catch (err) {
     return res.status(404).json({ error: (err as Error).message });
   }
+});
+
+// POST /api/fines - issue a new fine
+app.post('/api/fines', (req: Request, res: Response) => {
+  const { vehicleNumber, driverName, phone, offence, location, officerName, amount } = req.body;
+  if (!vehicleNumber || !offence || !amount) {
+    return res.status(400).json({ error: 'vehicleNumber, offence and amount are required' });
+  }
+
+  const fine = db.issueFine({ vehicleNumber, driverName, phone, offence, location, officerName, amount });
+  if (phone) {
+    sendSms(phone, `You have been issued fine ${fine.fineId} for ${fine.offence}. Amount ${fine.amount} LKR.`);
+  }
+
+  res.status(201).json(fine);
+});
+
+// POST /api/otp/request - send OTP to a phone
+app.post('/api/otp/request', async (req: Request, res: Response) => {
+  const { phone } = req.body;
+  if (!phone) return res.status(400).json({ error: 'phone required' });
+  try {
+    await requestOtp(phone);
+    res.json({ status: 'otp_sent' });
+  } catch (err) {
+    res.status(500).json({ error: 'failed to send otp' });
+  }
+});
+
+// POST /api/otp/verify - verify OTP code
+app.post('/api/otp/verify', (req: Request, res: Response) => {
+  const { phone, code } = req.body;
+  if (!phone || !code) return res.status(400).json({ error: 'phone and code required' });
+  const verified = verifyOtp(phone, code);
+  res.json({ verified });
 });
 
 // GET /api/receipt/:receiptId - retrieve receipt details

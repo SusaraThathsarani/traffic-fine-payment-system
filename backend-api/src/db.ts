@@ -8,6 +8,7 @@ const fines: Map<string, TrafficFine> = new Map([
       fineId: 'FINE-1001',
       vehicleNumber: 'WP-NA-1234',
       driverName: 'John Perera',
+      phone: '+94771234567',
       offence: 'Speeding',
       location: 'Colombo',
       officerName: 'Officer Silva',
@@ -22,6 +23,7 @@ const fines: Map<string, TrafficFine> = new Map([
       fineId: 'FINE-1002',
       vehicleNumber: 'WP-KA-5678',
       driverName: 'Jane Wickrama',
+      phone: '+94779876543',
       offence: 'No License Plate',
       location: 'Kandy',
       officerName: 'Officer Kumara',
@@ -60,6 +62,33 @@ export const db = {
     receipts.set(receiptId, receipt);
     fine.status = 'paid';
     return receipt;
+  },
+
+  issueFine: (data: {
+    vehicleNumber: string;
+    driverName?: string;
+    phone?: string;
+    offence: string;
+    location?: string;
+    officerName?: string;
+    amount: number;
+  }): TrafficFine => {
+    const fineId = `FINE-${Math.random().toString(36).slice(2, 9).toUpperCase()}`;
+    const fine: TrafficFine = {
+      fineId,
+      vehicleNumber: data.vehicleNumber,
+      driverName: data.driverName,
+      phone: data.phone,
+      offence: data.offence,
+      location: data.location,
+      officerName: data.officerName,
+      amount: data.amount,
+      issuedAt: new Date().toISOString(),
+      status: 'issued',
+    };
+
+    fines.set(fineId, fine);
+    return fine;
   },
 
   getReceipt: (receiptId: string): Receipt | undefined => {

@@ -2,6 +2,7 @@ export type TrafficFine = {
   fineId: string;
   vehicleNumber: string;
   driverName?: string;
+  phone?: string;
   offence: string;
   location?: string;
   officerName?: string;
