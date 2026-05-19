@@ -1,0 +1,68 @@
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Editor folders and settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+packages/*/node_modules/
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.build/
+dist/
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+
+# Node / frontend builds
+build/
+dist/
+coverage/
+.next/
+.nuxt/
+out/
+
+# Java / Kotlin / Gradle
+*.class
+*.jar
+*.war
+*.ear
+.gradle/
+build/
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+
+# Go
+*.exe
+*.test
+
+# Misc temporary files
+tmp/
+temp/
